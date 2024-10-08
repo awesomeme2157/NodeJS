@@ -1,6 +1,15 @@
 const shortid = require("shortid");
 const URL = require("../models/urlSchema");
 
+// GET
+const handleGetAllURL = async (req, res) => {
+  const allUrls = await URL.find({});
+  return res.render("home", {
+    Urls: allUrls,
+  });
+};
+
+// POST
 const handleGenerateNewShortURL = async (req, res) => {
   const body = req.body;
 
@@ -17,13 +26,17 @@ const handleGenerateNewShortURL = async (req, res) => {
       visitHistory: [],
     });
 
-    return res.status(201).json({ id: shortId });
+    return res.render("home", {
+      id: shortId,
+    });
+    // return res.json({ id: shortId });
   } catch (err) {
     console.error("Error creating new short URL:", err);
     return res.status(500).json({ error: "Server error" });
   }
 };
 
+// GET Redirect
 const handleRouting = async (req, res) => {
   const shortId = req.params.shortId;
   const entry = await URL.findOneAndUpdate(
@@ -41,6 +54,32 @@ const handleRouting = async (req, res) => {
   res.redirect(entry.redirectURL);
 };
 
+// const handleRouting = async (req, res) => {
+//   const shortId = req.params.shortId;
+
+//   try {
+//     const entry = await URL.findOneAndUpdate(
+//       { shortId },
+//       {
+//         $push: {
+//           visitHistory: { timestamp: Date.now() },
+//         },
+//       },
+//       { new: true } // Return the updated document
+//     );
+
+//     if (!entry) {
+//       return res.status(404).send("URL not found");
+//     }
+
+//     return res.redirect(entry.redirectURL);
+//   } catch (err) {
+//     console.error("Error during redirection:", err);
+//     return res.status(500).send("Server error");
+//   }
+// };
+
+// GET analytics
 const handleGetAnalytics = async (req, res) => {
   const shortId = req.params.shortId;
   const result = await URL.findOne({ shortId });
@@ -52,6 +91,7 @@ const handleGetAnalytics = async (req, res) => {
 };
 
 module.exports = {
+  handleGetAllURL,
   handleGenerateNewShortURL,
   handleRouting,
   handleGetAnalytics,
