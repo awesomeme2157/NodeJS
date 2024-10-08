@@ -1,42 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
+  <head>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
     </style>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Home Page</title>
-</head>
+  </head>
 
-<body>
+  <body>
     <h1>URL Shortner</h1>
     <div>
-        <form method="post" action="/url">
-            <label>Enter your original URL : </label>
-            <input type="text" name="URL" placeholder="https://www.example.com" />
-            <button type="submit">Generate</button>
-        </form>
+      <form method="post" action="/url">
+        <label>Enter your original URL : </label>
+        <input type="text" name="URL" placeholder="https://www.example.com" />
+        <button type="submit">Generate</button>
+      </form>
     </div>
-    <br>
+    <br />
 
     <div>
-        <% if (locals.id) { %>
-            <p>Generated shortened URL: <a href="http://localhost:8001/url/new/<%= id %>">
-                    http://localhost:8001/url/new/<%= id %>
-                </a></p>
-            <% } %>
+      <% if (locals.id) { %>
+      <p>
+        Generated shortened URL:
+        <a href="http://localhost:8001/url/new/<%= id %>">
+          http://localhost:8001/url/new/<%= id %>
+        </a>
+      </p>
+      <% } %>
     </div>
-    <br>
-
+    <br />
     <div>
-        <h2>Table</h2>
+      <h2>URL Analytics Table</h2>
     </div>
-
-
-</body>
-
+  </body>
 </html>

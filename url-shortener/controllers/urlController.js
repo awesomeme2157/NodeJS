@@ -1,12 +1,11 @@
 const shortid = require("shortid");
 const URL = require("../models/urlSchema");
 
-// GET
+// GET all urls
 const handleGetAllURL = async (req, res) => {
   const allUrls = await URL.find({});
-  return res.render("home", {
-    Urls: allUrls,
-  });
+
+  res.render("home", { urls: allUrls });
 };
 
 // POST
@@ -29,7 +28,6 @@ const handleGenerateNewShortURL = async (req, res) => {
     return res.render("home", {
       id: shortId,
     });
-    // return res.json({ id: shortId });
   } catch (err) {
     console.error("Error creating new short URL:", err);
     return res.status(500).json({ error: "Server error" });
@@ -38,57 +36,53 @@ const handleGenerateNewShortURL = async (req, res) => {
 
 // GET Redirect
 const handleRouting = async (req, res) => {
-  const shortId = req.params.shortId;
-  const entry = await URL.findOneAndUpdate(
-    {
-      shortId,
-    },
-    {
-      $push: {
-        visitHistory: {
-          timestamp: Date.now(),
-        },
+  try {
+    const shortId = req.params.shortId;
+    const entry = await URL.findOneAndUpdate(
+      {
+        shortId,
       },
+      {
+        $push: {
+          visitHistory: {
+            timestamp: Date.now(),
+          },
+        },
+      }
+    );
+
+    if (!entry) {
+      return res.status(404).json({ error: "Short URL not found" });
     }
-  );
-  res.redirect(entry.redirectURL);
+
+    res.redirect(entry.redirectURL);
+  } catch (err) {
+    console.error("Error during redirection:", err);
+    return res.status(500).json({ error: "Server error" });
+  }
 };
 
-// const handleRouting = async (req, res) => {
-//   const shortId = req.params.shortId;
-
-//   try {
-//     const entry = await URL.findOneAndUpdate(
-//       { shortId },
-//       {
-//         $push: {
-//           visitHistory: { timestamp: Date.now() },
-//         },
-//       },
-//       { new: true } // Return the updated document
-//     );
-
-//     if (!entry) {
-//       return res.status(404).send("URL not found");
-//     }
-
-//     return res.redirect(entry.redirectURL);
-//   } catch (err) {
-//     console.error("Error during redirection:", err);
-//     return res.status(500).send("Server error");
-//   }
-// };
 
 // GET analytics
 const handleGetAnalytics = async (req, res) => {
-  const shortId = req.params.shortId;
-  const result = await URL.findOne({ shortId });
+  try {
+    const shortId = req.params.shortId;
+    const result = await URL.findOne({ shortId });
 
-  return res.json({
-    totalClicks: result.visitHistory.length,
-    analytics: result.visitHistory,
-  });
+    if (!result) {
+      return res.status(404).json({ error: "Short URL not found" });
+    }
+
+    return res.json({
+      totalClicks: result.visitHistory.length,
+      analytics: result.visitHistory,
+    });
+  } catch (err) {
+    console.error("Error fetching analytics:", err);
+    return res.status(500).json({ error: "Server error" });
+  }
 };
+
 
 module.exports = {
   handleGetAllURL,
