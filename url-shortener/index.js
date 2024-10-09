@@ -1,8 +1,8 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const path = require("path");
-const urlRoute = require("./routes/urlRoutes");
-const staticRoute = require("./routes/staticRouter");
+const cookieParser = require("cookie-parser");
+
 const { connectToMongoDB } = require("./connection");
 
 const app = express();
@@ -16,8 +16,15 @@ app.set("views", path.resolve("./views"));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
-app.use("/url", urlRoute);
+const urlRoute = require("./routes/urlRoutes");
+const staticRoute = require("./routes/staticRouter");
+const userRoute = require("./routes/userRouter");
+const { restrictToLoggedinUserOnly } = require("./middlewares/auth");
+
+app.use("/url", restrictToLoggedinUserOnly, urlRoute);
+app.use("/user", userRoute);
 app.use("/", staticRoute);
 
 app.listen(PORT, (err) => {

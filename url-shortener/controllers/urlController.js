@@ -1,5 +1,5 @@
 const shortid = require("shortid");
-const URL = require("../models/urlSchema");
+const URL = require("../models/url");
 
 // GET all urls
 const handleGetAllURL = async (req, res) => {
